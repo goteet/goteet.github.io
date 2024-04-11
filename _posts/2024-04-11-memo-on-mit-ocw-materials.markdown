@@ -1,7 +1,7 @@
 ---
 layout: post
 title: ocw.mit.edu 漫游备忘
-tags: self-learning math open-course
+tags: self-learning math ocw
 mathjax: true
 ---
 
@@ -9,7 +9,7 @@ mathjax: true
 
 网站一共分三个，分别是 [MIT OpenCourseWare], [MIT EECS学院网站] 和 [MIT Degree Chart]。
 
-# OCW
+## OCW
 对于公开课网站，没什么好说的。其中的课程号也是根据学院来划分的。
 
 其中课程编号规则如下：`DepartmenID.CourseID`
@@ -29,7 +29,7 @@ mathjax: true
 https://mapping.mit.edu/curriculum-mapping
 
 
-# MIT Course Catalog
+## MIT Course Catalog
 本网站主要是提供的是 MIT 学生能从专业计划毕业的所有学习科目和培养计划。详细介绍了每个学校不同专业的细节。本科、硕士的培养计划、课程信息、辅修学位（Minor in Computer Science）
 
 **GIR** - General Institute Requirement。主要包括数学、物理、化学、生物、体育。当然也包括人文艺术社科和沟通要求。[http://catalog.mit.edu/mit/undergraduate-education/general-institute-requirements/](http://catalog.mit.edu/mit/undergraduate-education/general-institute-requirements/)
@@ -38,9 +38,9 @@ https://mapping.mit.edu/curriculum-mapping
 
 > 早些年浏览学院网站的时候，一直不明白*电气工程和计算机科学（6-2）*，和 *计算机工程和科学（6-3）* 两个专业的区别在哪里。找了好久毫无头绪，顺便这次也在新版网站得到了答案。
 
-# EECS 学院网站
+## EECS 学院网站
 
-## 学科要求
+### 学科要求
 
 整个大学一共分为四个阶段，我们应该认为这是循序渐进的过程。
 
@@ -58,7 +58,7 @@ https://mapping.mit.edu/curriculum-mapping
 
 根据不同的主修课程，有可能会要求参加一些 *Department LAB*，自主探究（*Independent Inquiry*）科目，或者在院内达到一定的知识广度。
 
-## 术语 Abbr.
+### 术语 Abbr.
 
 * SB Degree - Bachelor of Science (in Mathematic) 理学学士学位
 * B.E, B.Eng,  B.A.I - Bachelor of Engineering 工学学士学位
@@ -77,7 +77,7 @@ https://mapping.mit.edu/curriculum-mapping
 > Students, faculty, staff, and other members of the MIT community organize about 600 noncredit activities and 100 for-credit subjects. These are publicized on the IAP website, beginning in October. 
 > In addition, there are many individually arranged projects that are not officially publicized.
 
-# MIT Unit 课时说明
+## MIT Unit 课时说明
 
 MIT 使用 Units 作为课程时长的计量单位。MIT一般使用 (A-B-C)的方式来计量课程时间。
 
