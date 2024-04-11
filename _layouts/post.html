@@ -23,16 +23,16 @@
     <div id="header_wrap" class="outer">
         <header class="inner">
           <span id="page_title">{{ page.title }}</span>
-          <span id="back_to_home"><a href="{{ site.baseurl }}"> back </a></span>
-          <span id="tag_list"> #Tags:
+          <span id="back_to_home"><a href="{{ site.url }}"> back </a></span>
+          <span id="tag_list">
             <ul>
             {% if page.tags %}
               {% for tag in page.tags %}
-              <li class="post-tag"><a href="{{ site.baseurl }}#{{ tag | slugify }}">{{ tag }}</a></li>
+              <li class="post-tag"><a href="{{ site.url }}#{{ tag | slugify }}">{{ tag }}</a></li>
               {% endfor %}
             {% endif %}
             </ul>
-          </span>          
+          </span>
         </header>
     </div>
 
@@ -45,10 +45,10 @@
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
-      <span id="back_to_home"><a href="{{ site.baseurl }}">Back to Posts</a></span>
-      {% if site.github.is_project_page %}
-        <p class="copyright"> the pages and posts are maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-      {% endif %}
+      <footer class="inner">
+        <span id="back_to_home"><a href="{{ site.url }}">Back to Posts</a></span>
+        <p class="copyright">The pages and posts are maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+      </footer>
     </div>
 
     {% if site.google_analytics %}
