@@ -5,11 +5,17 @@ tags: self-learning math ocw
 mathjax: true
 ---
 
+2021-03-12 把自我理解从备忘里移出去单独成文<br/>
+2024-04-11 复活技术博客时重新梳理<br/>
+
+# ocw.mit.edu 漫游备忘
+
 这本应该是一个存在 OneNote 里的笔记，但是我写这篇文章的时候还没有大规模使用 OneNote，考虑到其他朋友有可能会文，所以就直接留在这里了。之前为了写文章凑了一组文字，现在我尽量保持简洁。
 
 网站一共分三个，分别是 [MIT OpenCourseWare], [MIT EECS学院网站] 和 [MIT Degree Chart]。
 
 ## OCW
+
 对于公开课网站，没什么好说的。其中的课程号也是根据学院来划分的。
 
 其中课程编号规则如下：`DepartmenID.CourseID`

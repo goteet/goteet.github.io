@@ -11,6 +11,9 @@ mathjax: true
 2021-03-12 将文档拆分成两部分，避免过于冗长。<br/>
 2024-04-11 复活技术博客时重新梳理<br/>
 
+
+# 自我教学的思路整理
+
 疫情给我们每个人都提了个醒，当时认为时遭遇了人生中重要的历史时刻，所以开始反思自己一直以来的学习工作状况，并完成了这篇文章。
 
 虽然在接下来的这几年里，我的工作也遇到了重大的变故，而且我的精神状况特别的差。在这个条件下，我也没有能写出当时文章的那种的心气。我猜，可能时因为当时处于一个正式自学的起步阶段，就像 hello world 一样三分钟热度，让我完成了这篇文章。
@@ -90,4 +93,4 @@ mathjax: true
 
 
 [MIT OpenCourseWare]: https://ocw.mit.edu/
-[CS undergraduate curriculum]: {{ site.url }}/assets/2024-04-11-review-on-my-self-teaching/curriculum_roadmap.png
+[CS undergraduate curriculum]: {{ site.url }}/assets/2020-02-05-review-on-my-self-teaching/curriculum_roadmap.png
