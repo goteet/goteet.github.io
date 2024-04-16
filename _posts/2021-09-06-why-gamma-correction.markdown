@@ -125,7 +125,7 @@ $$
 
 我们需要的是一个可变步长的渐变。在暗部区域，我们需要小步长来记录更多的色阶，而亮部我们人眼不容易察觉变化的位置，则增大步长。这张图只是示意：
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/band_ppm_decoded.png)
+![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/band_ppm_encoded.png)
 
 为了能保存尽量多的色阶，很自然的我们想到直接保存人眼“视觉渐变”的数据，是不是就可以了？调整后的数据使用定长步长，相当于是原始数据使用了变长的步长。暗部存储获得更多的色阶。
 
