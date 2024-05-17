@@ -125,7 +125,7 @@ $$
 
 我们需要的是一个可变步长的渐变。在暗部区域，我们需要小步长来记录更多的色阶，而亮部我们人眼不容易察觉变化的位置，则增大步长。这张图只是示意：
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/band_ppm_encoded.png)
+![encoded band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/band_ppm_encoded.png)
 
 为了能保存尽量多的色阶，很自然的我们想到直接保存人眼“视觉渐变”的数据，是不是就可以了？调整后的数据使用定长步长，相当于是原始数据使用了变长的步长。暗部存储获得更多的色阶。
 
@@ -183,7 +183,7 @@ $$
 
 我们需要在 shader 或者 Gfx Device API 中抵消掉显示器的 DTF 曲线。否则，你就会获得这样一个屎结果
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/lighting_calculation_problem.png)
+![lighting calculation problem]({{ site.url }}/assets/2021-09-06-why-gamma-correction/lighting_calculation_problem.png)
 
 ### Light Calculation
 
@@ -191,7 +191,7 @@ $$
 
 之前讨论了这么多的 Gamma in Image 的情况，就是想明确，我们的图片资源也是需要 Gamma Correction 的。我们需要把 EncodedData 转到线性空间中来。
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/system_gamma_correction.png)
+![system gamma correction]({{ site.url }}/assets/2021-09-06-why-gamma-correction/system_gamma_correction.png)
 
 幸运的是，现代的 GPU 都是支持 sRGB 格式的，通过正确的设置，采样的时候，硬件会协助我们获得线性的结果。
 
@@ -206,7 +206,7 @@ $$
 
 同理，输出到 Frame Buffer 之后，进行 Blending 的过程也需要线性空间。在 sRGB 空间中进行混合，得到的结果应该会变得过于明亮。
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/blending_calculation_problem.png)
+![blending calculation problem]({{ site.url }}/assets/2021-09-06-why-gamma-correction/blending_calculation_problem.png)
 
 如果使用了支持 sRGB 的格式，硬件会在每次混合之前完成转换，并在混合之后将结果重新编码到 sRGB 空间中。
 
@@ -214,7 +214,7 @@ $$
 
 当我们渲染一个三角形的时候，三角形的边缘可能会覆盖部分的像素。如果没有正确进行 Gamma Correction，写入像素值的时候有可能会变得更暗。
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/anti_aliasing_problem_2.png)
+![anti aliasing problem 2]({{ site.url }}/assets/2021-09-06-why-gamma-correction/anti_aliasing_problem_2.png)
 
 这会使得抗锯齿算法将边缘误认为图12的右侧部分，最终影响输出图像。在做 Filtering 的时候，由于数值非线性，导致了还原出来的边界不是一条直线，最终造成了下图中左侧的 Roping 现象。
 
@@ -224,11 +224,11 @@ $$
 
 用黑白两色方块均匀排列为棋盘状，将这个 Pattern 不断重复，直到看不清间隙。当色块密度足够时，看起来像是一个纯色块为止。
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/resize-large.png)
+![checbox resize]({{ site.url }}/assets/2021-09-06-why-gamma-correction/resize-large.png)
 
 由于黑白格是均匀相间的，我们可以认为他们分别提供了整张图片的50%，据此推定此图为 50% 亮度的中度灰。以两纯色块作为参考对比，50%中度灰与 128 有很大差别，看起来与 187 的数值颜色能对应上。
 
-![perceptual band]({{ site.url }}/assets/2021-09-06-why-gamma-correction/resize.png)
+![checkbox comparison]({{ site.url }}/assets/2021-09-06-why-gamma-correction/resize.png)
 
 由此可知输入信号要达到 $\cfrac{187}{256}=73.3%$ 。根据之前对DTF，我们可以根据显示器 $\gamma=2.2$ 进行变换，最终结果正好是50%，也就是人眼睛观察的中度灰。
 

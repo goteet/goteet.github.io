@@ -32,7 +32,7 @@ mathjax: true
 
 曾经有一个关注课程之间前后依赖关系的星座图，但是随着更新找不到了。他的原始出处在这里，很方便的查询课程依赖关系。推荐自学前进行查询：
 
-https://mapping.mit.edu/curriculum-mapping
+<https://mapping.mit.edu/curriculum-mapping>
 
 
 ## MIT Course Catalog
