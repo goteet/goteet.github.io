@@ -5,6 +5,9 @@ tags: rendering ray-tracing monte-carlo importance-sampling
 mathjax: true
 ---
 
+
+2024-05-17 调整一下介绍反函数的逻辑<br/>
+
 # 射线追踪(5) 采样 Lambertian BRDF
 
 看了这么多书，手痒痒了。今天试试实践一下重要性采样。
@@ -50,23 +53,37 @@ $$
 
 这下就简单多了对吧。至于平均采样，我们在(4) 的末尾里也有推过，这里就不重复展开了。但是，为了能说明如何按照分布来生成样本。我仍然要从均匀分布说起。
 
-## 生成符合余弦分布的样本
+## 反函数法生成符合分布的样本
 
-考虑到半球的特殊性，我们如何在半球上生成均匀分布的方向？如果是两个 IID，我们可以将极坐标的参数 $\phi$，$\theta$ 分别采样。然而，你将会的得到这样的结果
+考虑到半球的特殊性，我们使用 Inverse Function Method 反函数发来生成对应分布的样本。为了能在描述过程中验证，我们首先考虑圆上的均匀分布。如何在圆上生成均匀分布的采样点呢？
+
+从直觉上，我们可以通过极坐标参数方程表示样本点位置
+
+$$
+\begin{cases}
+x = r \cdot cos\theta
+\\
+y = r \cdot sin\theta
+\end{cases}
+$$
+
+然后分别对 $r$ 和 $\theta$ 两个分量进行采样。然而，你将会的得到这样的结果
 
 ![weighted circle samples]({{ site.url }}/assets/2024-04-18-ray-tracing-5-sampling-lambertian/weighted_circle_samples.png)
 
-考虑 $d\omega=sin\theta d\theta d\phi$ ，这个 θ 并非是均匀变化的。点分布的环状在越靠近法线的方向就越小，所以随机点分布的越密集。[[1](#1)<a name="ref-1"></a>] 
 
-### 反函数法
+产生这个问题的原因是两个参数并非是独立同分布的。我不太能解释这个问题，类似的情况可以考虑立体角微元 $d\omega=sin\theta d\theta d\phi$ ，这个 $\theta$ 并非是均匀变化的。点分布的环状在越靠近法线的方向就越小，所以随机点分布的越密集。[[1](#1)<a name="ref-1"></a>] 
 
-常见的方法是采用 Inverse Function Method。顾名思义，我们需要计算分布函数的反函数。然后把均匀随机变量 $\xi$ 带入其中，就可以得到符合 p 分布的随机变量 $\alpha$
+
+采用反函数法能避免这个问题。顾名思义，我们需要计算分布函数的反函数。然后把均匀随机变量 $\xi$ 带入其中，就可以得到符合 p 分布的随机变量 $\alpha$
 
 $$
 \alpha = P^-1(\xi)
 $$
 
-到这一步就很简单了，都是上面聊过的内容。不过对于立体角 $\omega$ 我们不太好直接积分，所以一般转化到球面坐标去计算：$\omega = R d\theta d\phi$。其中包含两个参数，对应的多参数的情况，二维联合概率分布如下：
+一般情况下对于立体角 $\omega$ 我们不太好直接积分，所以一般转化到球面坐标去计算：$d\omega = sin\theta d\theta d\phi$。
+
+所以我们的概率分布是一个二位分布，包含两个参数。对应的多参数的情况，我们采用二维联合概率分布来表示，定义如下：
 
 $$
 F(x,y)
@@ -90,12 +107,12 @@ $$
 F_X(x) = F(x, y_{max})=\int_{x_{min}}^{x}{\left( \int_{y_{min}}^{y_{max}}{pdf(u,v)du }\right)dv}
 $$
 
-$y$ 的上下界都是已知常量，括号内可以算出数值解的呀。我们用圆盘举例，圆盘极坐标是 $\omega=rd\theta dr$，均匀分布 $pdf=\cfrac{1}{\pi R^2}$，所以联合概率分布可以写成：
+$y$ 的上下界都是已知常量，括号内可以算出数值解。以圆盘举例 $dxdy=rd\theta dr$ （雅各比变换时另一个话题），均匀分布 $pdf=\cfrac{1}{\pi r^2}$，所以联合概率分布可以写成：
 
 $$
 F(r,\theta) 
-= \int_{0}^{r}{\int_{0}^{\theta}{\cfrac{1}{\pi R^2}rd\theta dr}}
-=\cfrac{\theta r^2}{2\pi R^2}
+= \int_{0}^{r}{\int_{0}^{\theta}{\cfrac{1}{\pi r^2}rd\theta dr}}
+=\cfrac{\theta r^2}{2\pi r^2}
 $$
 
 同时边界概率分布还满足 Chain Rule： $F(x,y) = F(x \vert y) * F(y) = F(x) * F(y \vert x)$。根据定义，我们可以通过出发得到 y 轴上的边界概率分布函数：
@@ -124,7 +141,7 @@ $$
 
 ![weighted circle samples]({{ site.url }}/assets/2024-04-18-ray-tracing-5-sampling-lambertian/unified_circle_samples.png)
 
-根据计算出来的两个式子，我们很明显看到采样 比原来均匀多了，可以证明此方法是有效的。
+根据计算出来的两个式子，我们很明显看到采样比原来均匀多了，可以证明此方法是有效的。
 
 ### 计算半球边界分布函数
 
@@ -190,7 +207,7 @@ z &= rcos\theta
 \end{cases}
 $$
 
-就可以轻松随机出符合余弦权重分布的方向了。我相信其他内容读者能够自行handle，到这里已经OK了。附上代码
+就可以轻松随机出符合余弦权重分布的方向了，附上代码
 
 ```
 float3 random_direction(u1, u2) {
@@ -208,5 +225,23 @@ float3 random_direction(u1, u2) {
     );
 }
 ```
+## 整合
+
+最后一步，我们将生成的随机方向带回重要性采样的评估式。我相信其他内容读者能够自行handle，到这里已经OK了。代码示例：
+
+```
+const int N = 100;
+const float rho = MaterialAlbedo;
+
+Lo = Spectrum(0);
+for(int i = 0; i < N; i++)
+{
+    float u[2] = { IID1.next(), IID2.next() };
+    float3 Xi = random_direction(u[0], u[1]);
+    Lo += Li(Xi);
+}
+Lo = Lo * (rho / N);
+```
+
 
 <a name="1"></a> [[1](#ref-1)] Importance Sampling of a Hemisphere, https://www.mathematik.uni-marburg.de/~thormae/lectures/graphics1/code/ImportanceSampling/index.html
