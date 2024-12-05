@@ -7,7 +7,11 @@ mathjax: true
 
 # 关于 UE4 深度的速记
 
-这几天看 UE4 代码，关于使用缓存深度重建世界坐标的代码。发现有些诡异，所以重新推导了一下。可疑代码是这样的：
+这几天看 UE4 代码，关于使用缓存深度重建世界坐标的代码。发现有些诡异，所以重新推导了一下。
+
+## 问题
+
+可疑代码是这样的：
 
 ```
 float SampleDepth = DepthBuffer.Sample(...);
@@ -16,20 +20,20 @@ float2 SceenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w;
 float3 WorldPosition = mul(float4(ScreenPosition * SceneDepth, SceneDepth, 1), View.ScreenToWorld).xyz;
 ```
 
-## 问题
-我的问题出在这里：
+我的问题出在这一行代码：
 ```
 ClipPosition = float4(ScreenPosition * SceneDepth, SceneDepth, 1);
 ```
 
-我认为这里的 component Z 应该是 ClipPosition.Z = z*(Az+B);
+我认为空间变换时，z component 不应该等于 SceneDepth。从投影矩阵的定义来看，应该是形如 $Az+B$，其中AB分别为：
+
 ```
 float A = ProjectMatrix_33;
 float B = ProjectMatrix_34;
-float Z = SceneDepth * (A * SceneDepth + B);
+float Z = A * SceneDepth + B;
 ```
 
-如果我们考虑一个顶点通过投影矩阵转换到裁剪空间。先考虑投影矩阵 ProjectionMatrix，常用的朋友都知道矩阵大体形式如下：
+如果我们回顾一个顶点通过投影矩阵转换到裁剪空间的过程。先考虑投影矩阵 ProjectionMatrix 的构成，大致形式如下：
 
 $$
 M_{porj} =
@@ -41,39 +45,41 @@ P & 0 & 0 & 0 \\
 \end{pmatrix}
 $$
 
-那么我们就可以通过这个矩阵得到如下的式子
+那么我们就可以通过这个矩阵得出顶点变换的式子
 
 $$
-V'_{clip}(x', y', z', w')  = M_{proj} * V_{view}(x, y, z, 1) = (Px, Qy, Az+B, z)
+V_{clip}(x', y', z', w')  = M_{project} * V_{view}(x, y, z, 1) = (Px, Qy, Az+B, z)
 $$
 
-然后再通过透视除法转换到 NDC
+然后再通过透视除法转换到 NDC，
 $$
-V_{NDC}=(\cfrac{x'}{z}, \cfrac{y'}{z}, \cfrac{z'}{z}, 1)
+V_{NDC}=(\cfrac{x'}{z}, \cfrac{y'}{z}, \cfrac{z'}{z}, 1)\\
 $$
 
-所以我们取得 `SampleDepth=z'`，并将其转换到 `z` 之后，我们需要拼凑的坐标应该是  $(xy*z, z'*z, z)$; 但是 UE 在 Z Component 上写的是 1.0 * z，那应该是远平面呀？
+我们从 depth buffer中采样获得的 `SampleDepth=z'`，并将 `z'` 通过`ConvertFromDeviceZ()`转换得到 `z` 。如果我们需要拼凑 clip space 的齐次坐标，应该为：$V_{clip}=(xy*z, z'*z, z)$; 但是 UE 在 Z Component 上写的是 1.0 * z，可以认为 z'=1.0，那应该是远平面呀？而且w=1.0 是冲突的？
 
 ## 调查
-这里犯了两个错误：其一是 我混淆了几个不同的 z 数据；其二是 UE4 用的是 Reversed-Z， 所以 1.0 应该是近平面。接下来就记录一下我的调查结果。
+
+这里犯了两个错误：其一是我混淆了几个不同的 z 数据；其二是 UE4 用的是 Reversed-Z， 所以 1.0 应该是近平面。接下来就记录一下调查结果。
 
 为了保持和上文一致，我们
 * 用 z 来表示 Viewspace linear Z，被投影矩阵变换之前的 z 值
 * 用 z' 来表示 Clipspace linear Z，被投影矩阵变换之后的 z 值
 * 用 SampleDepth 表示从深度缓冲区里读取出来的 z 值
 
-那么深度缓冲里保存的值应该等于： 
+那么深度缓冲里保存的值应该等于：
+
 $$
 SampleDepth = \cfrac{z'}{z}
 $$
 
-这是一个复合值，我们可以反算出 z 吗？可以的。因为
+这是一个复合值，我们可以反算出 z 吗？可以的。从投影矩阵中我们可以得到变换公式
 
 $$
-z' = Az + B \rightarrow \cfrac{z'}{z} = A + \cfrac{B}{z}
+z' = Az + B \rightarrow SampleDepth=\cfrac{z'}{z} = A + \cfrac{B}{z}
 $$
 
-据此，我们可以直接通过透视投影的矩阵得到：
+据此，我们可以直接通过透视投影矩阵的 A，B 算出 z (viewspace linear z)：
 
 $$
 z = \cfrac{B}{SampleDepth - A} = \cfrac{1}{ \cfrac{1}{B}SampleDepth - \cfrac{A}{B} }
@@ -81,7 +87,7 @@ $$
 
 这个也是 `ConvertFromDeviceZ(x)` 的实现，感兴趣的小伙伴可以查阅相关函数 `CreateInvDeviceZToWorldZTransform` [[1](#1)<a name="ref-1"></a>] 确认变换逻辑。
 
-所以，我们需要的Z Component 应该是 $z'*z = Az+B$ 和实际上的写着的 z 有出入。是不是哪里错了？如果 z 表示的是 $Az+B$ ，那么我们不能用他对着 XY Comp 相乘。
+所以，我们需要的Z Component 应该是 $z'*z = Az+B$ 和实际上的写着的 z 有出入。是不是哪里错了？如果 scene depth z 表示的是 $Az+B$ ，那么我们不能用他对着 component xy 相乘？
 
 ## 猫腻
 
@@ -111,11 +117,13 @@ $$
 
 经过这个矩阵的变换，我们的构造的特殊矩阵就变成了：
 ```
-  Matrix_ * (ScreenPos.xy * z, z, 1)
-= (ScreenPos.xy * SceneDepth, A*z+B, z)
+  //Matrix * (x,y,z,1) = (x,y,Az+B,z) 
+  //==>
+  Matrix * (ScreenPos.xy * SceneDepth, SceneDepth, 1)
+= (ScreenPos.xy * SceneDepth, A*SceneDepth+B, SceneDepth)
 ```
 
-Bingo! 
+**Bingo!**
 
 实际上我一开始是清醒的，但是我对投影矩阵关于 1/z 的线性有一点模糊，所以在没仔细推断的情况下一下蒙蔽了。手算一遍就好了。
 
