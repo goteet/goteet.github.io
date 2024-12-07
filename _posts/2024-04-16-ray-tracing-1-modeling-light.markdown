@@ -30,7 +30,7 @@ mathjax: true
 
 光时一种电磁横波，和机械波不一样，光是可以脱离介质在真空中传播的。我们知道真空中传播是有恒定速度 $c$ 进行传播的。
 
-![light wave]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/light_wave.png)
+![light wave]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/light_wave.png)
 
 
 #### 光与物质的交互
@@ -39,7 +39,7 @@ mathjax: true
 
 我们知道，物质是由许多原子紧密排列组成的。物质中单个原子、或者许多原子组成的原子簇，被我们统称为粒子。当光与物质表面接触到时候，光会被这些粒子改变前进方向。
 
-![light medium interaction]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/light_medium_interaction.png)
+![light medium interaction]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/light_medium_interaction.png)
 
 当光照射到这些粒子的时候，粒子吸收其能量，极化之后重新向其他方向射出新的光线。当然这些光线的速度又可能会和原来的光线速度不一样了，也就是他们的波长变化了。
 
@@ -47,11 +47,11 @@ mathjax: true
 
 说到波长，我们人眼识别光线，只能识别有限范围波长的可见光，从400nm的紫光，一直到700nm的红光。自然界的彩色世界中，光是以多种不同的波长组合而成的，如下图所示：
 
-![light medium interaction]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/complex_light_wave.png)
+![light medium interaction]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/complex_light_wave.png)
 
 当然这个波看起来有点点复杂，波峰波谷的变化有点吓人。不过幸运的是，人们发现，光线的复合波是可以通过单播叠加组合到一起形成。
 
-![light wave comparison]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/light_wave_composition.png)
+![light wave comparison]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/light_wave_composition.png)
 
 左上角是这个光的光谱分布，`Spectrum Power Distrubtion`(SPD)，右侧则是他的波形。于是自然而然的，工程师们想到了用单波组合来模拟整个光谱的方法。我们常用红绿蓝三种单波来组成光线的记录。
 
@@ -83,7 +83,7 @@ mathjax: true
 
 但是对于光学角度来说，没有绝对平整的表面。这又回到了一开始的原子级别的考虑。对于那些大小远小于光波长的粒子，称这种微小的不规则性为 `Nanogeometry`，这些粒子在影响光的方向时，由于方向不一致，会发生衍射和互相干涉的现象。
 
-![surface diffraction]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/surface_diffraction.png)
+![surface diffraction]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/surface_diffraction.png)
 
 从惠更斯-菲涅尔定律，我们可以认为光再碰到粒子的时候会发出 360° 的偏折，从图中来看就是类似一个圆形、或者半圆形。
 
@@ -99,7 +99,7 @@ mathjax: true
 
 几何光学是我们模拟渲染中主要使用的视角，这里忽略了光的干涉和衍射现象，只讨论折射反射的情况。
 
-![reflection and refraction]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/reflection_and_refraction.png)
+![reflection and refraction]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/reflection_and_refraction.png)
 
 在几何光学中的讨论中，光被建模为射线，而假设介质表面是平坦表面。光线射线在接触到介质表面时发生的散射现象，主要是反射和折射两种类型。所以在这个范畴里，我们主要考量反射和折射这两种散射。他们各自的方向偏转，和介质表面的法线相关。
 
@@ -115,7 +115,7 @@ mathjax: true
 
 为了模拟方便，我们常会将直接反射的光线称为 Specular 高光反射，和这些特殊反射的光线称为 Diffuse 漫反射。这个划分主要还是基于测量的方便性，易于单独测量而进行了区分。其实他给我后来的程序设计时造成了很大的困扰，不过为了简单我们过后再聊。
 
-![diffuse vs subsurface scattering]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/diffuse_or_subsurface_scattering.png)
+![diffuse vs subsurface scattering]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/diffuse_or_subsurface_scattering.png)
 
 然而，当我们近距离观测这些 `Deletric` 的时候，可能 折射-出射 的光线偏移原入射点是可感知的情况。这些位移横跨了多个像素，那么我们就无法再用 Diffuse 来模拟这种现象。此时我们称这个现象为此表面散射 `Subsurface Scattering`。
 
@@ -135,7 +135,7 @@ mathjax: true
 
 以下图片展示的是一个有色光的光谱分布，`Spectrum Power Distribution` 简称 SPD。经过试验，人们发现人类无法分辨出通过红绿蓝三种激光组合而成的简化波，和自然光波。
 
-![spd comparison]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/spd_comparison.png)
+![spd comparison]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/spd_comparison.png)
 
 所以这两个光谱在我们人类眼中呈现的是相同的色彩。
 
@@ -199,7 +199,7 @@ $$
 
 现代相机使用透镜替换了针孔。虽然透镜的引入带来了景深的限制，但是传感器却能获得更多的的光线摄入，不同方向的光线经过透镜折射，落在同一个传感器上。
 
-![camera model]({{ site.url }}/assets//2024-04-16-ray-tracing-1-modeling-light/camera_model.png)
+![camera model]({{ site.url }}/assets/2024-04-16-ray-tracing-1-modeling-light/camera_model.png)
 
 不过在渲染建模时，仍然采用的是类似古典针孔相机的模型。不过为了简化，我们将针孔后移到画面的后方，如图所示。以一个数学概念上大小为 0 的点，作为眼睛位置，渲染进行时，从眼睛位置 $c$ 处发出射线对场景进行采样。射线穿过感器表面形成采样点，最终与场景物体相交。
 
